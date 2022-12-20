@@ -14,6 +14,9 @@ env:
   DEV_KEY_VAULT_NAME: 'kvossonazurejavaspringde'
   DEV_APP_NAME: 'pet-clinic-1'
   DEV_APP_SERVICE: 'ossonazure-javaspring-host-dev'
+  
+  PROD_APP_NAME: 'pet-clinic-1'
+  PROD_APP_SERVICE: 'ossonazure-javaspring-host-prod'
 
 jobs:
   build_test_and_package:
@@ -94,4 +97,25 @@ jobs:
           use-staging-deployment: false
           package: ${{ github.workspace }}/*.jar
           environment-variables: -POSTGRES_USER ${{ env.POSTGRES_USER }} -POSTGRES_PASS ${{ env.POSTGRES_PASS }} -POSTGRES_URL ${{ env.POSTGRES_URL }} -SPRING_PROFILES_ACTIVE postgres
+        
+  deploy_to_prod:
+    runs-on: ubuntu-latest
+
+    name: Deploy to Prod environment
+
+    # Only run on pushes to the "main" branch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    needs: [deploy_to_dev]
+
+    steps:
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v3.0.1
+        with:
+          name: pet-clinic
+
+      - name: Login via Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.SP_GITHUBACTIONS_WORKFLOW_PETCLINIC_APP_PROD_RESOURCE_GROUP }}  
           
