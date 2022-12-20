@@ -85,6 +85,14 @@ jobs:
         with:
           creds: ${{ secrets.SP_GITHUBACTIONS_WORKFLOW_PETCLINIC_APP_DEV_RESOURCE_GROUP }}
           
+      - name: Do Azure CLI things
+        uses: Azure/cli@v1.0.7
+        with:
+          inlineScript: |
+            az account show
+            az storage -h
+            az deployment group create
+          
       - name: Retrive values from Azure Key Vault
         run: |
           # Get the values from Azure Key Vault and store in environment variables
