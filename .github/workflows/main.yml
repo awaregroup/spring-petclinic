@@ -15,8 +15,11 @@ env:
   DEV_APP_NAME: 'pet-clinic-1'
   DEV_APP_SERVICE: 'ossonazure-javaspring-host-dev'
   
-  PROD_APP_NAME: 'pet-clinic-1'
-  PROD_APP_SERVICE: 'ossonazure-javaspring-host-prod'
+  PROD_APP_NAME: 'pet-clinic-2'
+  PROD_APP_SERVICE: 'ossonazure-javaspring-host-prod2'
+  PROD_RG_NAME: 'OssOnAzure-JavaSpring-Prod'
+  
+  PRIMARY_DEPLOYMENT_REGION_NAME: 'southeastasia'
 
 jobs:
   build_test_and_package:
@@ -72,7 +75,7 @@ jobs:
     needs: [build_test_and_package]
     
     steps:
-      - name: Download a Build Artifact
+      - name: Download the Pet Clinic application artifact
         uses: actions/download-artifact@v3.0.1
         with:
           name: pet-clinic
@@ -116,13 +119,29 @@ jobs:
     needs: [deploy_to_dev]
 
     steps:
-      - name: Download a Build Artifact
+      - name: Download the Pet Clinic application artifact
         uses: actions/download-artifact@v3.0.1
         with:
           name: pet-clinic
+          
+      - name: Download the Bicep template artifact
+        uses: actions/download-artifact@v3.0.1
+        with:
+          name: bicep-template
 
       - name: Login via Azure CLI
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.SP_GITHUBACTIONS_WORKFLOW_PETCLINIC_APP_PROD_RESOURCE_GROUP }}  
+          creds: ${{ secrets.SP_GITHUBACTIONS_WORKFLOW_PETCLINIC_APP_PROD_RESOURCE_GROUP }}
+          
+      - name: Deploy Azure Resource Manager (ARM) Template
+        uses: Azure/arm-deploy@v1.0.9
+        with:
+          scope: 'resourcegroup'
+          resourceGroupName: ${{ env.PROD_RG_NAME }}
+          template: ${{ github.workspace }}/azuredeploy.bicep
+          deploymentMode: Incremental
+          deploymentName: 'automated-deploy-from-github-actions'
+          parameters: springAppServiceName=${{ env.PROD_APP_SERVICE }} springAppInstanceName=${{ env.PROD_APP_NAME }} resourceLocationName=${{ env.PRIMARY_DEPLOYMENT_REGION_NAME }}
+          failOnStdErr: true
           
