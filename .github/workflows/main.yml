@@ -137,7 +137,8 @@ jobs:
       - name: Deploy infrastructure to the Prod environment
         uses: Azure/cli@v1.0.7
         with:
-          inlineScript: az deployment group create --resource-group ${{ env.PROD_RG_NAME }} --name 'automated-deploy-from-github-actions-run${{ github.run_number }}-attempt${{ github.run_attempt }}' --template-file ${{ github.workspace }}/azuredeploy.bicep --parameters springAppServiceName=${{ env.PROD_APP_SERVICE }} springAppInstanceName=${{ env.PROD_APP_NAME }} resourceLocationName=${{ env.PRIMARY_DEPLOYMENT_REGION_NAME }}
+          inlineScript: |
+            az deployment group create --resource-group ${{ env.PROD_RG_NAME }} --name 'automated-deploy-from-github-actions-run${{ github.run_number }}-attempt${{ github.run_attempt }}' --template-file ${{ github.workspace }}/azuredeploy.bicep --parameters springAppServiceName=${{ env.PROD_APP_SERVICE }} springAppInstanceName=${{ env.PROD_APP_NAME }} resourceLocationName=${{ env.PRIMARY_DEPLOYMENT_REGION_NAME }} --verbose
           
 #      - name: Deploy infrastructure to the Prod environment
 #        uses: Azure/arm-deploy@v1.0.9
