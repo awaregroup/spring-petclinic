@@ -22,11 +22,11 @@ jobs:
       uses: peter-evans/create-pull-request@v4.2.3
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: Fixes by misspell-fixer
-        base: ${{ github.ref }}
-        branch: 'fix/typos-${{ github.sha }}'
-        delete-branch: true
-        title: '[Automated] Typos fixed by misspell-fixer'
+        #commit-message: 'Fixes by misspell-fixer'
+        #base: ${{ github.ref }}
+        #branch: 'fix/typos-${{ github.sha }}'
+        #delete-branch: true
+        #title: '[Automated] Typos fixed by misspell-fixer'
 
 #    - name: Create a PR for any issues that are identified
 #      uses: peter-evans/create-pull-request@v3
