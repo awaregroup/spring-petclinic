@@ -25,7 +25,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         #commit-message: 'Fixes by misspell-fixer'
-        #base: ${{ github.ref }}
+        base: ${{ github.ref }}
         #branch: 'fix/typos-${{ github.sha }}'
         #delete-branch: true
         #title: '[Automated] Typos fixed by misspell-fixer'
