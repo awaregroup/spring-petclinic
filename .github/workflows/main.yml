@@ -14,6 +14,12 @@ env:
   DEV_KEY_VAULT_NAME: 'kvossonazurejavaspringde'
   DEV_APP_NAME: 'pet-clinic-1'
   DEV_APP_SERVICE: 'ossonazure-javaspring-host-dev'
+  
+  PROD_APP_NAME: 'pet-clinic-2'
+  PROD_APP_SERVICE: 'ossonazure-javaspring-host-prod'
+  PROD_RG_NAME: 'OssOnAzure-JavaSpring-Prod'
+  
+  PRIMARY_DEPLOYMENT_REGION_NAME: 'southeastasia'
 
 jobs:
   build_test_and_package:
@@ -44,17 +50,24 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Upload a Build Artifact
+      - name: Upload the Pet Clinic application artifact
         uses: actions/upload-artifact@v3.1.1
         with:
-          name: pet-clinic
+          name: pet-clinic-app
           path: ${{ github.workspace }}/target/*.jar
+          if-no-files-found: error
+          
+      - name: Upload the Bicep template artifact
+        uses: actions/upload-artifact@v3.1.1
+        with:
+          name: bicep-template
+          path: ${{ github.workspace }}/azuredeploy.bicep
           if-no-files-found: error
           
   deploy_to_dev:
     runs-on: ubuntu-latest
     
-    name: Deploy to Dev environment
+    name: Deploy to the Dev environment
     
     # Only run on pushes to the "main" branch
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -62,15 +75,23 @@ jobs:
     needs: [build_test_and_package]
     
     steps:
-      - name: Download a Build Artifact
+      - name: Download the Pet Clinic application artifact
         uses: actions/download-artifact@v3.0.1
         with:
-          name: pet-clinic
+          name: pet-clinic-app
 
       - name: Login via Azure CLI
         uses: azure/login@v1
         with:
           creds: ${{ secrets.SP_GITHUBACTIONS_WORKFLOW_PETCLINIC_APP_DEV_RESOURCE_GROUP }}
+          
+      - name: Do Azure CLI things
+        uses: Azure/cli@v1.0.7
+        with:
+          inlineScript: |
+            az account show
+            az storage -h
+            az deployment group create
           
       - name: Retrive values from Azure Key Vault
         run: |
@@ -84,7 +105,7 @@ jobs:
           echo "POSTGRES_PASS=$POSTGRES_PASS" >> $GITHUB_ENV
           echo "POSTGRES_USER=$POSTGRES_USER" >> $GITHUB_ENV
           
-      - name: Deploy artifact to the Dev environment
+      - name: Deploy Pet Clinic application to the Dev environment
         uses: Azure/spring-apps-deploy@v1
         with:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION_ID }}
@@ -94,4 +115,47 @@ jobs:
           use-staging-deployment: false
           package: ${{ github.workspace }}/*.jar
           environment-variables: -POSTGRES_USER ${{ env.POSTGRES_USER }} -POSTGRES_PASS ${{ env.POSTGRES_PASS }} -POSTGRES_URL ${{ env.POSTGRES_URL }} -SPRING_PROFILES_ACTIVE postgres
+        
+  deploy_to_prod:
+    runs-on: ubuntu-latest
+
+    name: Deploy to the Production environment
+
+    # Only run on pushes to the "main" branch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    needs: [deploy_to_dev]
+
+    steps:
+      - name: Download the Pet Clinic application artifact
+        uses: actions/download-artifact@v3.0.1
+        with:
+          name: pet-clinic-app
+          
+      - name: Download the Bicep template artifact
+        uses: actions/download-artifact@v3.0.1
+        with:
+          name: bicep-template
+
+      - name: Login via Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.SP_GITHUBACTIONS_WORKFLOW_PETCLINIC_APP_PROD_RESOURCE_GROUP }}
+          
+#      - name: Deploy infrastructure to the Prod environment
+#        uses: Azure/cli@v1.0.7
+#        with:
+#          inlineScript: |
+#            az deployment group create --resource-group ${{ env.PROD_RG_NAME }} --name 'automated-deploy-from-github-actions-run${{ github.run_number }}-attempt${{ github.run_attempt }}' --template-file ${{ github.workspace }}/azuredeploy.bicep --parameters springAppServiceName=${{ env.PROD_APP_SERVICE }} springAppInstanceName=${{ env.PROD_APP_NAME }} resourceLocationName=${{ env.PRIMARY_DEPLOYMENT_REGION_NAME }} --verbose
+          
+      - name: Deploy infrastructure to the Prod environment
+        uses: Azure/arm-deploy@v1.0.9
+        with:
+          scope: 'resourcegroup'
+          resourceGroupName: ${{ env.PROD_RG_NAME }}
+          template: ${{ github.workspace }}/azuredeploy.bicep
+          deploymentMode: Incremental
+          deploymentName: 'automated-deploy-from-github-actions-run${{ github.run_number }}-attempt${{ github.run_attempt }}'
+          parameters: springAppServiceName=${{ env.PROD_APP_SERVICE }} springAppInstanceName=${{ env.PROD_APP_NAME }} resourceLocationName=${{ env.PRIMARY_DEPLOYMENT_REGION_NAME }}
+          failOnStdErr: true
           
