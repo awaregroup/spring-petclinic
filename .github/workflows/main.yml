@@ -53,7 +53,7 @@ jobs:
       - name: Upload the Pet Clinic application artifact
         uses: actions/upload-artifact@v3.1.1
         with:
-          name: pet-clinic
+          name: pet-clinic-app
           path: ${{ github.workspace }}/target/*.jar
           if-no-files-found: error
           
@@ -78,7 +78,7 @@ jobs:
       - name: Download the Pet Clinic application artifact
         uses: actions/download-artifact@v3.0.1
         with:
-          name: pet-clinic
+          name: pet-clinic-app
 
       - name: Login via Azure CLI
         uses: azure/login@v1
@@ -130,7 +130,7 @@ jobs:
       - name: Download the Pet Clinic application artifact
         uses: actions/download-artifact@v3.0.1
         with:
-          name: pet-clinic
+          name: pet-clinic-app
           
       - name: Download the Bicep template artifact
         uses: actions/download-artifact@v3.0.1
