@@ -134,12 +134,12 @@ jobs:
         with:
           creds: ${{ secrets.SP_GITHUBACTIONS_WORKFLOW_PETCLINIC_APP_PROD_RESOURCE_GROUP }}
           
-      - name: Azure CLI Action
+      - name: Deploy infrastructure to the Prod environment
         uses: Azure/cli@v1.0.7
         with:
           inlineScript: az deployment group create --resource-group ${{ env.PROD_RG_NAME }} --name 'automated-deploy-from-github-actions-run${{ github.run_number }}-attempt${{ github.run_attempt }}' --template-file ${{ github.workspace }}/azuredeploy.bicep --parameters springAppServiceName=${{ env.PROD_APP_SERVICE }} springAppInstanceName=${{ env.PROD_APP_NAME }} resourceLocationName=${{ env.PRIMARY_DEPLOYMENT_REGION_NAME }}
           
-#      - name: Deploy infrastructure to Prod environment
+#      - name: Deploy infrastructure to the Prod environment
 #        uses: Azure/arm-deploy@v1.0.9
 #        with:
 #          scope: 'resourcegroup'
