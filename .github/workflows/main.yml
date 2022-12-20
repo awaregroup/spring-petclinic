@@ -15,8 +15,8 @@ env:
   DEV_APP_NAME: 'pet-clinic-1'
   DEV_APP_SERVICE: 'ossonazure-javaspring-host-dev'
   
-  PROD_APP_NAME: 'pet-clinic-2'
-  PROD_APP_SERVICE: 'ossonazure-javaspring-host-prod2'
+  PROD_APP_NAME: 'pet-clinic-3'
+  PROD_APP_SERVICE: 'ossonazure-javaspring-host-prod3'
   PROD_RG_NAME: 'OssOnAzure-JavaSpring-Prod'
   
   PRIMARY_DEPLOYMENT_REGION_NAME: 'southeastasia'
@@ -134,14 +134,19 @@ jobs:
         with:
           creds: ${{ secrets.SP_GITHUBACTIONS_WORKFLOW_PETCLINIC_APP_PROD_RESOURCE_GROUP }}
           
-      - name: Deploy infrastructure to Prod environment
-        uses: Azure/arm-deploy@v1.0.9
+      - name: Azure CLI Action
+        uses: Azure/cli@v1.0.7
         with:
-          scope: 'resourcegroup'
-          resourceGroupName: ${{ env.PROD_RG_NAME }}
-          template: ${{ github.workspace }}/azuredeploy.bicep
-          deploymentMode: Incremental
-          deploymentName: 'automated-deploy-from-github-actions-run${{ github.run_number }}-attempt${{ github.run_attempt }}'
-          parameters: springAppServiceName=${{ env.PROD_APP_SERVICE }} springAppInstanceName=${{ env.PROD_APP_NAME }} resourceLocationName=${{ env.PRIMARY_DEPLOYMENT_REGION_NAME }}
-          failOnStdErr: true
+          inlineScript: az deployment group create --resource-group ${{ env.PROD_RG_NAME }} --name 'automated-deploy-from-github-actions-run${{ github.run_number }}-attempt${{ github.run_attempt }}' --template-file ${{ github.workspace }}/azuredeploy.bicep --parameters springAppServiceName=${{ env.PROD_APP_SERVICE }} springAppInstanceName=${{ env.PROD_APP_NAME }} resourceLocationName=${{ env.PRIMARY_DEPLOYMENT_REGION_NAME }}
+          
+#      - name: Deploy infrastructure to Prod environment
+#        uses: Azure/arm-deploy@v1.0.9
+#        with:
+#          scope: 'resourcegroup'
+#          resourceGroupName: ${{ env.PROD_RG_NAME }}
+#          template: ${{ github.workspace }}/azuredeploy.bicep
+#          deploymentMode: Incremental
+#          deploymentName: 'automated-deploy-from-github-actions-run${{ github.run_number }}-attempt${{ github.run_attempt }}'
+#          parameters: springAppServiceName=${{ env.PROD_APP_SERVICE }} springAppInstanceName=${{ env.PROD_APP_NAME }} resourceLocationName=${{ env.PRIMARY_DEPLOYMENT_REGION_NAME }}
+#          failOnStdErr: true
           
