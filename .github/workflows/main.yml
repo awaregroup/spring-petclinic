@@ -47,11 +47,18 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Upload a Build Artifact
+      - name: Upload the Pet Clinic application artifact
         uses: actions/upload-artifact@v3.1.1
         with:
           name: pet-clinic
           path: ${{ github.workspace }}/target/*.jar
+          if-no-files-found: error
+          
+      - name: Upload the Bicep template artifact
+        uses: actions/upload-artifact@v3.1.1
+        with:
+          name: bicep-template
+          path: ${{ github.workspace }}/azuredeploy.bicep
           if-no-files-found: error
           
   deploy_to_dev:
