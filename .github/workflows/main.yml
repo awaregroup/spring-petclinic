@@ -15,8 +15,8 @@ env:
   DEV_APP_NAME: 'pet-clinic-1'
   DEV_APP_SERVICE: 'ossonazure-javaspring-host-dev'
   
-  PROD_APP_NAME: 'pet-clinic-3'
-  PROD_APP_SERVICE: 'ossonazure-javaspring-host-prod3'
+  PROD_APP_NAME: 'pet-clinic-2'
+  PROD_APP_SERVICE: 'ossonazure-javaspring-host-prod'
   PROD_RG_NAME: 'OssOnAzure-JavaSpring-Prod'
   
   PRIMARY_DEPLOYMENT_REGION_NAME: 'southeastasia'
