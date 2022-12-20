@@ -97,7 +97,7 @@ jobs:
           echo "POSTGRES_PASS=$POSTGRES_PASS" >> $GITHUB_ENV
           echo "POSTGRES_USER=$POSTGRES_USER" >> $GITHUB_ENV
           
-      - name: Deploy artifact to the Dev environment
+      - name: Deploy Pet Clinic application to the Dev environment
         uses: Azure/spring-apps-deploy@v1
         with:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION_ID }}
@@ -134,7 +134,7 @@ jobs:
         with:
           creds: ${{ secrets.SP_GITHUBACTIONS_WORKFLOW_PETCLINIC_APP_PROD_RESOURCE_GROUP }}
           
-      - name: Deploy Azure Resource Manager (ARM) Template
+      - name: Deploy infrastructure to Prod environment
         uses: Azure/arm-deploy@v1.0.9
         with:
           scope: 'resourcegroup'
