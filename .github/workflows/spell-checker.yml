@@ -7,8 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-
+  check_spelling:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,32 +18,3 @@ jobs:
       uses: check-spelling/check-spelling@v0.0.21
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        #config: # optional, default is .github/actions/spelling
-      
- #   - uses: igsekor/pyspelling-any@v0.0.2
- #     name: Spellcheck
- #     
- #   - name: typos-action
- #     uses: crate-ci/typos@v1.0.4
-#
- #   - name: Perform spell check
- #     uses: sobolevn/misspell-fixer-action@0.1.0
- #     with:
- #       options: '-rsvn src/'
- #       
- #   - name: Create a PR for any issues that are identified
- #     uses: peter-evans/create-pull-request@v4.2.3
- #     with:
- #       token: ${{ secrets.GITHUB_TOKEN }}
- #       #commit-message: 'Fixes by misspell-fixer'
- #       base: ${{ github.ref }}
- #       #branch: 'fix/typos-${{ github.sha }}'
- #       #delete-branch: true
- #       #title: '[Automated] Typos fixed by misspell-fixer'
-
-#    - name: Create a PR for any issues that are identified
-#      uses: peter-evans/create-pull-request@v3
-#      with:
-#        token: ${{ secrets.GITHUB_TOKEN }}
-#        commit-message: 'Fixes by misspell-fixer'
-#        title: 'Typos fixed by misspell-fixer'
